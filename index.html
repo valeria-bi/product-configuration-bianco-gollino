@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <meta name="description" content="A layout example that shows off a responsive photo gallery.">
+	    <title>Secondo progetto Interactive 3D Graphics - Valeria Bianco e Alessandro Gollino</title>    
+	 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	    <link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<style type="text/css">@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');</style>
+		<script src="libs/three.js"></script>
+		<script src="libs/stats.min.js"></script>
+		<script src="libs/OrbitControls.js"></script>
+		<script src='libs/dat.gui.min.js'></script>
+		<script src='libs/GLTFLoader.js'></script>
+		<script src='libs/BufferGeometryUtils.js'></script>
+		<script src="script/setting.js"></script>
+		<script src="script/funzioni.js"></script>
+
+
+		<script> //Tale funzione serve per quando la pagina è piccola e mostro un menù responsive
+      	function myFunction() {
+
+         var x = document.getElementById("myTopnav");
+            if (x.className === "navbar") {
+               x.className += " responsive";
+            } else {
+               x.className = "navbar";
+            }
+      	}
+      	
+      	</script>
+
+		<!-- shaders -->
+		<!--Shader per materiali argento e oro e con illuminazione proveniente dalla environment map-->
+		<script type="text/x-glsl" id="vertex_glossy">
+			precision highp float;
+			precision highp int;
+			attribute vec4 tangent;
+			varying vec3 vNormal;
+			varying vec3 vTangent;
+			varying vec3 vBitangent;
+			varying vec3 vPosition;
+			varying vec2 vUv;
+
+			void main() {
+				vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
+				vPosition = vPos.xyz;
+				vNormal = normalize(normalMatrix * normal);
+				vec3 objectTangent = vec3( tangent.xyz );
+				vec3 transformedTangent = normalMatrix * objectTangent;
+				vTangent = normalize( transformedTangent );
+				vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
+				vUv = uv;
+				gl_Position = projectionMatrix * vPos;
+			}
+		</script>
+
+		<script type="text/x-glsl" id="fragment_glossy">
+			precision highp float;
+			precision highp int;
+			varying vec3 vNormal;
+			varying vec3 vTangent;
+			varying vec3 vBitangent;
+			varying vec3 vPosition;
+			varying vec2 vUv;
+			uniform vec3 cspec;
+			uniform sampler2D normalMap;
+			uniform samplerCube envMap;
+			uniform vec2 normalScale;
+			uniform float roughness;
+
+			const float PI = 3.14159;
+			#define saturate(a) clamp( a, 0.0, 1.0 )
+
+			float pow2( const in float x ) { 
+				return x*x; 
+			}
+
+			float getSpecularMIPLevel( const in float roughness, const in int maxMIPLevel ) {
+				float maxMIPLevelScalar = float( maxMIPLevel );
+				float sigma = PI * roughness * roughness / ( 1.0 + roughness );
+				float desiredMIPLevel = maxMIPLevelScalar + log2( sigma );
+				// clamp to allowable LOD ranges.
+				return clamp( desiredMIPLevel, 0.0, maxMIPLevelScalar );
+			}
+
+			vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+				return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
+			}
+
+			vec3 BRDF_Specular_GGX_Environment( const in vec3 viewDir, const in vec3 normal, const in vec3 specularColor, const in float roughness ) {
+				float dotNV = saturate( dot( normal, viewDir ) );
+				const vec4 c0 = vec4( - 1, - 0.0275, - 0.572, 0.022 );
+				const vec4 c1 = vec4( 1, 0.0425, 1.04, - 0.04 );
+				vec4 r = roughness * c0 + c1;
+				float a004 = min( r.x * r.x, exp2( - 9.28 * dotNV ) ) * r.x + r.y;
+				vec2 brdf = vec2( -1.04, 1.04 ) * a004 + r.zw;
+				return specularColor * brdf.x + brdf.y;
+			} 
+
+			void main() {
+				vec3 normal = normalize( vNormal );
+				vec3 tangent = normalize( vTangent );
+				vec3 bitangent = normalize( vBitangent );
+				mat3 vTBN = mat3( tangent, bitangent, normal );
+				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+				//mapN.xy = normalScale * mapN.xy;
+				vec3 n = normalize( vTBN * mapN );
+				vec3 v = normalize( -vPosition);
+				vec3 vReflect = reflect(vPosition,n);
+				vec3 r = inverseTransformDirection( vReflect, viewMatrix );
+
+				float alpha = roughness * roughness;
+				float specularMIPLevel = getSpecularMIPLevel(alpha,8 );
+
+	 			vec3 envLight = textureCubeLodEXT( envMap, vec3(-r.x, r.yz), specularMIPLevel ).rgb;
+	 			// texture in sRGB, linearize
+				envLight = pow( envLight, vec3(2.2));
+				vec3 outRadiance = envLight*BRDF_Specular_GGX_Environment(n, v, cspec, alpha);
+				// gamma encode the final value
+				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
+				//gl_FragColor = vec4(r,1.0);
+			}
+		</script>
+
+		<!--Shader per materiali Ruggine, Latta, Osso, Legno e iluminazione irradiance map-->
+		<script type="text/x-glsl" id="vertex_iem">
+			attribute vec4 tangent;
+			varying vec3 vNormal;
+			varying vec3 vPosition;
+			varying vec3 vTangent;
+			varying vec3 vBitangent;
+			varying vec2 vUv;
+
+			void main() {
+				vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
+				vPosition = vPos.xyz;
+				vNormal = normalize(normalMatrix * normal);
+				vec3 objectTangent = vec3( tangent.xyz );
+				vec3 transformedTangent = normalMatrix * objectTangent;
+				vTangent = normalize( transformedTangent );
+				vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
+				vUv = uv;
+				gl_Position = projectionMatrix * vPos;
+			}
+		</script>
+
+		<script type="text/x-glsl" id="fragment_iem">
+			varying vec3 vNormal;
+			varying vec3 vTangent;
+			varying vec3 vBitangent;
+			varying vec3 vPosition;
+			varying vec2 vUv;
+			uniform sampler2D diffuseMap;
+			uniform sampler2D normalMap;
+			uniform samplerCube irradianceMap;
+			uniform vec2 normalScale;
+			uniform vec2 textureRepeat;
+
+			vec3 cdiff;
+
+		    vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+			    return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
+		    }
+
+			void main() {
+				vec3 normal = normalize( vNormal );
+				vec3 tangent = normalize( vTangent );
+				vec3 bitangent = normalize( vBitangent );
+				mat3 vTBN = mat3( tangent, bitangent, normal );
+				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+				//mapN.xy = normalScale * mapN.xy;
+				vec3 n = normalize( vTBN * mapN );
+				vec3 worldN = inverseTransformDirection( n, viewMatrix );
+				// negate x to account for how cubemap is displayed on background
+				vec3 irradiance = textureCube( irradianceMap, worldN).rgb;
+				// texture in sRGB, linearize
+				irradiance = pow( irradiance, vec3(2.2));
+				cdiff = texture2D( diffuseMap, vUv  *textureRepeat).rgb;
+				// texture in sRGB, linearize
+				cdiff = pow( cdiff, vec3(2.2));
+				vec3 outRadiance = cdiff*irradiance;
+				// gamma encode the final value
+				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
+			}
+		</script>
+
+		<!--Shader per materiali oro e argento e illuminazione proveniente da 3 luci puntiformi-->
+		<script type="text/x-glsl" id="vertex_normal">
+	 		attribute vec4 tangent;
+			varying vec3 vNormal;
+			varying vec3 vPosition;
+			varying vec2 vUv;
+			varying vec3 vTangent;
+			varying vec3 vBitangent;
+
+			void main() {
+				vec4 vPos = modelViewMatrix * vec4( position, 1.0 );
+				vPosition = vPos.xyz;
+				vNormal = normalize(normalMatrix * normal);
+				vec3 objectTangent = vec3( tangent.xyz );
+				vec3 transformedTangent = normalMatrix * objectTangent;
+				vTangent = normalize( transformedTangent );
+				vBitangent = normalize( cross( vNormal, vTangent ) * tangent.w );
+				vUv = uv;
+				gl_Position = projectionMatrix * vPos;
+			}
+        </script>
+
+        <script type="text/x-glsl" id="fragment_normal">
+			varying vec3 vNormal;
+			varying vec3 vTangent;
+			varying vec3 vBitangent;
+			varying vec3 vPosition;
+			varying vec2 vUv;
+			uniform vec3 pointLightPosition; // in world space
+			uniform vec3 clight;
+			uniform vec3 pointLightPosition2; // in world space
+			uniform vec3 clight2;
+			uniform vec3 pointLightPosition3; // in world space
+			uniform vec3 clight3;
+			uniform vec3 cspec;
+			uniform vec3 cdiff;
+			uniform float roughness;
+			uniform sampler2D normalMap;
+			uniform vec2 normalScale;
+			const float PI = 3.14159;
+
+			vec3 FSchlick(float vDoth, vec3 f0) {
+				return f0 + (vec3(1.0)-f0)*pow(1.0 - vDoth,5.0);
+			}
+
+			float DGGX(float NoH, float alpha) {
+				float alpha2 = alpha * alpha;
+				float k = NoH*NoH * (alpha2 - 1.0) + 1.0;
+    			return alpha2 / (PI * k * k );
+			}
+
+			float G1(float nDotv, float alpha) {
+				float alpha2 = alpha*alpha;
+				return 2.0 * (nDotv / (nDotv + sqrt(alpha2 + (1.0-alpha2)*nDotv*nDotv )));
+			}
+
+			float GSmith(float nDotv, float nDotl, float alpha) {
+				return G1(nDotl,alpha)*G1(nDotv,alpha);
+			}
+
+			void main() {
+				vec4 lPosition = viewMatrix * vec4( pointLightPosition, 1.0 );
+				vec3 l = normalize(lPosition.xyz - vPosition.xyz);
+				vec4 lPosition2 = viewMatrix * vec4( pointLightPosition2, 1.0 );
+				vec3 l2 = normalize(lPosition2.xyz - vPosition.xyz);
+				vec4 lPosition3 = viewMatrix * vec4( pointLightPosition3, 1.0 );
+				vec3 l3 = normalize(lPosition3.xyz - vPosition.xyz);
+				vec3 normal = normalize( vNormal );
+				vec3 tangent = normalize( vTangent );
+				vec3 bitangent = normalize( vBitangent );
+				// matrix to convert bewtween tangent space and view space
+				mat3 vTBN = mat3( tangent, bitangent, normal );
+				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+				//mapN.xy = normalScale * mapN.xy;
+				vec3 n = normalize( vTBN * mapN );
+				vec3 v = normalize( -vPosition);
+				vec3 h = normalize( v + l);
+				vec3 h2 = normalize( v + l2);
+				vec3 h3 = normalize (v + l3);
+				// small quantity to prevent divisions by 0
+				float nDotl = max(dot( n, l ),0.000001);
+				float lDoth = max(dot( l, h ),0.000001);
+				float nDotl2 = max(dot( n, l2 ),0.000001);
+				float lDoth2 = max(dot( l2, h2 ),0.000001);
+				float nDotl3 = max(dot( n, l3 ),0.000001);
+				float lDoth3 = max(dot( l3, h3 ),0.000001);
+				float nDoth = max(dot( n, h ),0.000001);
+				float nDoth2 = max(dot( n, h2 ),0.000001);
+				float nDoth3 = max(dot( n, h3 ),0.000001);
+				float vDoth = max(dot( v, h ),0.000001);
+				float vDoth2 = max(dot( v, h2 ),0.000001);
+				float vDoth3 = max(dot( v, h3 ),0.000001);
+				float nDotv = max(dot( n, v ),0.000001);
+				vec3 fresnel = FSchlick(vDoth, cspec);
+				vec3 fresnel2 = FSchlick(vDoth2, cspec);
+				vec3 fresnel3 = FSchlick(vDoth3, cspec);
+				float alpha = roughness * roughness;
+				vec3 BRDF = (vec3(1.0)-fresnel)*cdiff/PI + fresnel*GSmith(nDotv,nDotl, alpha)*DGGX(nDoth,alpha)/
+					(4.0*nDotl*nDotv);
+				vec3 outRadiance = PI* clight * nDotl * BRDF;
+				vec3 BRDF2 = (vec3(1.0)-fresnel2)*cdiff/PI + fresnel2*GSmith(nDotv,nDotl2, alpha)*DGGX(nDoth2,alpha)/
+					(4.0*nDotl2*nDotv);
+				vec3 outRadiance2 = PI* clight2 * nDotl2 * BRDF2;
+				vec3 BRDF3 = (vec3(1.0)-fresnel3)*cdiff/PI + fresnel3*GSmith(nDotv,nDotl3, alpha)*DGGX(nDoth3,alpha)/
+					(4.0*nDotl3*nDotv);
+				vec3 outRadiance3 = PI* clight3 * nDotl3 * BRDF3;
+				vec3 outRadiancef = outRadiance + outRadiance2 + outRadiance3;
+				// gamma encode the final value
+				gl_FragColor = vec4(pow( outRadiancef, vec3(1.0/2.2)), 1.0);
+			}
+        </script>
+
+		<div>
+			<header>
+				<div class="intro">
+					<a id="nomeE">Elmo Vichingo</a>
+            		<a id="prezzoE"><span id="prezzo">150</span> €</a>
+         		</div>
+         		<div class="navbar" id="myTopnav">
+         			<a href="javascript:void(0);" class="iconM" onclick="myFunction()">Menu</a>
+         			<a id="logo" href="#" title="vai alla home">A C M E</a>
+            		<a href="#" title="vai alla pagina Scudi">Scudi</a>
+            		<a href="#" title="vai alla pagina Spade">Spade</a>
+            		<a href="#" class="link_proprio" title="vai alla pagina Elmi">Elmi</a>
+            		<a href="#" title="vai alla pagina Lance">Lance</a>
+            		<a href="#" title="vai alla pagina Altro">Altro</a>
+            		<a href="#" title="Cerca">Cerca</a>
+            		<a href="#" title="Carrello">Carrello</a>
+            		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+               			<i class="fa fa-bars"></i>
+            		</a>
+         		</div>
+         	</header>
+         	<div>
+         		<div>
+         			<script id="can" src="script/main.js"></script>
+         		</div>
+         		<div id = "menu" >
+         			<div class="caratteristiche">
+            			<h2 >Configura il modello</h2>
+            			<hr>
+            			<h3 >Elmo</h3>
+            			<ul class="hor">
+            				<li><button onclick="cambiaMaterialeElmo('Argento', null, null); setPrezzo(100)"><a>Argento</a><br><img src="immagini/Silver.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo('Oro',null, null); setPrezzo(250)"><a>Oro</a><br><img src="immagini/Gold.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo('Latta',null, null); setPrezzo(35)"><a>Latta</a><br><img src="immagini/Latta.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo('Legno',null, null); setPrezzo(0)"><a>Legno</a><br><img src="immagini/Legno.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo('Ruggine',null, null); setPrezzo(25)"><a>Ruggine</a><br><img src="immagini/Ruggine.jpg"></button></li>
+            			</ul>
+            			<hr>
+            			<h3 >Corna</h3>
+            			<ul class="hor">
+            				<li><button onclick="cambiaMaterialeElmo(null,'Argento', null)"><a>Argento</a><br><img src="immagini/Silver.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null,'Oro', null)"><a>Oro</a><br><img src="immagini/Gold.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null,'Osso', null)"><a>Osso</a><br><img src="immagini/Osso.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null,'Legno', null)"><a>Legno</a><br><img src="immagini/Legno.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null,'Ruggine', null)"><a>Ruggine</a><br><img src="immagini/Ruggine.jpg"></button></li>
+
+            			</ul>
+		            	<hr>
+		            	<h3 >Frontino</h3>
+		            	<ul class="hor">
+		            		<li><button onclick="cambiaMaterialeElmo(null, null, 'Argento')"><a>Argento</a><br><img src="immagini/Silver.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null ,null, 'Oro')"><a>Oro</a><br><img src="immagini/Gold.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null,null, 'Latta')"><a>Latta</a><br><img src="immagini/Latta.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null,null, 'Legno')"><a>Legno</a><br><img src="immagini/Legno.jpg"></button></li>
+            				<li><button onclick="cambiaMaterialeElmo(null,null, 'Ruggine')"><a>Ruggine</a><br><img src="immagini/Ruggine.jpg"></button></li>
+		            	</ul>
+		            	<hr>
+		            	<h3 >Ambiente</h3>
+		            	<ul class="ver">
+		            		<li><a onClick="cambiaAmbiente('Scogliera')" href="#">Scogliera</a></li>
+		            		<li><a onClick="cambiaAmbiente('ForestaInnevata')" href="#">Foresta innevata</a></li>
+		            		<li><a onClick="cambiaAmbiente('Fiordo')" href="#">Fiordo</a></li>
+		            		<li><a onclick="inserisciLuceManuale('')" href="#">Nessun Ambiente</a></li>
+		        		</ul>
+		        		<br>
+        			</div>
+        		</div>
+        		<hr>
+        		<div id="descrizione" >
+            		<div>
+                		<h2>Descrizione</h2>
+                		<p>
+            				Elmo vichingo (Nordischer Kammhelm in lingua tedesca) è il nome con cui si suole indicare la particolare tipologia di elmo in ferro sviluppato dalle popolazioni germaniche della Scandinavia durante l'Età del ferro germanica, codificata al tempo della Cultura di Vendel (da cui l'altro nome in tedesco, Vendelhelm) e poi reso celebre in Europa occidentale ed in Russia dalle incursioni dei Vichinghi.
+							Dal Vendelhelm vennero sviluppati, intorno all'Anno Mille, l'elmo "a nasale" noto come elmo normanno e l'elmo russo a mezza-maschera.
+							L'elmo vichingo viene comunemente indicato, a torto, quale tipologia di elmo cornuto. Si tratta di uno dei molti stereotipi che accompagnano il nome dei Vichinghi, sviluppatosi in Europa nel corso del Romanticismo.
+                		</p>
+                		<p>
+                			Il prodotto rappresenta una replica dell'elmo vichingo personalizzabile secondo le vostre preferenze!
+                		</p>
+            		</div>
+        		</div>
+    		</div>
+		    <div class="footer" >
+		            <a href="#" title="vai a Spedizioni e pagamento">Spedizioni e pagamento</a>
+		            <a href="#" title="vai ai Contatti">Contatti</a>
+		            <a href="#" title="vai a Info su ACME">Info su ACME</a>
+		            <a href="#" title="vai ad Account">Account</a>  
+		    </div>
+		</div>
+	</body>
+</html>
