@@ -193,8 +193,8 @@ function update() {
 function render() {
 
     onResize();
-	updateUniforms();
-	renderer.render( scene, camera );
+    updateUniforms();
+    renderer.render( scene, camera );
     
 }
 
