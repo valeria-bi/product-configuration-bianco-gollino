@@ -110,42 +110,42 @@ function cambiaMaterialeElmo(tipoE, tipoC, tipoF){
 				break;
 		}
 	}else if(tipoC != null){
-			switch(tipoC){
-				case 'Argento':
-					nuovoUniformsC = uniformsArgento;
-					textureCorna = false;
-					break;
-				case 'Oro':
-					nuovoUniformsC = uniformsOro;
-					textureCorna = false;
-					break;
-				case 'Osso' :
-					if(illuminazioneManuale){
-						alert("L'illuminazione manuale è disponibile solo per i materiali Argento e Oro! ");
-						return;
-					}else{
-						nuovoUniformsC = uniformsOsso;
-						textureCorna = true;
-					}
-					break;
-				case 'Legno' :
-					if(illuminazioneManuale){
-						alert("L'illuminazione manuale è disponibile solo per i materiali Argento e Oro! ");
-						return;
-					}else{
-						nuovoUniformsC = uniformsLegno;
-						textureCorna = true;
-					}
-					break;
-				case 'Ruggine' :
-					if(illuminazioneManuale){
-						alert("L'illuminazione manuale è disponibile solo per i materiali Argento e Oro! ");
-						return;
-					}else{
-						nuovoUniformsC = uniformsRuggine;
-						textureCorna = true;
-					}
-					break;
+		switch(tipoC){
+			case 'Argento':
+				nuovoUniformsC = uniformsArgento;
+				textureCorna = false;
+				break;
+			case 'Oro':
+				nuovoUniformsC = uniformsOro;
+				textureCorna = false;
+				break;
+			case 'Osso' :
+				if(illuminazioneManuale){
+					alert("L'illuminazione manuale è disponibile solo per i materiali Argento e Oro! ");
+					return;
+				}else{
+					nuovoUniformsC = uniformsOsso;
+					textureCorna = true;
+				}
+				break;
+			case 'Legno' :
+				if(illuminazioneManuale){
+					alert("L'illuminazione manuale è disponibile solo per i materiali Argento e Oro! ");
+					return;
+				}else{
+					nuovoUniformsC = uniformsLegno;
+					textureCorna = true;
+				}
+				break;
+			case 'Ruggine' :
+				if(illuminazioneManuale){
+					alert("L'illuminazione manuale è disponibile solo per i materiali Argento e Oro! ");
+					return;
+				}else{
+					nuovoUniformsC = uniformsRuggine;
+					textureCorna = true;
+				}
+				break;
 		}	
 	}else if(tipoF != null){
 			switch(tipoF){
@@ -269,29 +269,31 @@ function creaModelloIlluminato(uE,uC,uF){
 	}
 
 	if(!illuminazioneManuale){
+
 		if (!textureElmo) {
 			materialElmo = new THREE.ShaderMaterial({ uniforms: uE, vertexShader: vs_glossy, fragmentShader: fs_glossy, extensions: materialExtensions });
-		}
-		else {
+		}else {
 			materialElmo = new THREE.ShaderMaterial({ uniforms: uE, vertexShader: vs_iem, fragmentShader: fs_iem, extensions: materialExtensions });
 		}
+
 		if (!textureCorna) {
 			materialCorna = new THREE.ShaderMaterial({ uniforms: uC, vertexShader: vs_glossy, fragmentShader: fs_glossy, extensions: materialExtensions });
 		}else{
 			materialCorna = new THREE.ShaderMaterial({ uniforms: uC, vertexShader: vs_iem, fragmentShader: fs_iem, extensions: materialExtensions });
 		}
+
 		if(!textureFrontino){
 			materialFrontino = new THREE.ShaderMaterial({ uniforms: uF, vertexShader: vs_glossy, fragmentShader: fs_glossy, extensions: materialExtensions });	
-		}
-		else {
+		}else {
 			materialFrontino = new THREE.ShaderMaterial({ uniforms: uF, vertexShader: vs_iem, fragmentShader: fs_iem, extensions: materialExtensions });
-		}		
-	}
-	else{ 
+		}
+
+	}else{ 
 		materialElmo = new THREE.ShaderMaterial({ uniforms: uE, vertexShader: vs_normal, fragmentShader: fs_normal, extensions: materialExtensions });
 		materialCorna = new THREE.ShaderMaterial({ uniforms: uC, vertexShader: vs_normal, fragmentShader: fs_normal, extensions: materialExtensions });	
 		materialFrontino = new THREE.ShaderMaterial({ uniforms: uF, vertexShader: vs_normal, fragmentShader: fs_normal, extensions: materialExtensions });
 	}
+
 	aggiungiModello(materialElmo,materialCorna, materialFrontino);
 }
 
@@ -299,7 +301,6 @@ function onResize() {
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-  	
     renderer.setSize( windowWidth < 400? 400 : windowWidth, windowHeight < 400? 400 : windowHeight);
 
 }
