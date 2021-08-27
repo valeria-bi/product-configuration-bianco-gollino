@@ -189,6 +189,7 @@ function cambiaMaterialeElmo(tipoE, tipoC, tipoF){
 	else{
 		alert("L'illuminazione manuale è disponibile solo per i materiali Argento e Oro! ");
 	}
+	
 	creaModelloIlluminato(nuovoUniformsE,nuovoUniformsC, nuovoUniformsF);
 
 }
