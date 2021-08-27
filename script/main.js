@@ -70,8 +70,7 @@ var uniformsRuggine = {
     clight3: { type: "v3", value: new THREE.Vector3() },
     textureRepeat: { type: "v2", value: new THREE.Vector2(1,1) },
     normalScale: {type: "v2", value: new THREE.Vector2(1,1)},
-
-}
+};
 
 //Definisco parametri uniforms Latta
 var uniformsLatta = {
@@ -87,7 +86,7 @@ var uniformsLatta = {
     clight3: { type: "v3", value: new THREE.Vector3() },
     textureRepeat: { type: "v2", value: new THREE.Vector2(1,1) },
     normalScale: {type: "v2", value: new THREE.Vector2(1,1)},
-}
+};
 
 //Definisco parametri uniforms Legno
 var uniformsLegno = {
@@ -103,7 +102,7 @@ var uniformsLegno = {
     pointLightPosition3: { type: "v3", value: new THREE.Vector3() },
     clight3: { type: "v3", value: new THREE.Vector3() },
     normalScale: {type: "v2", value: new THREE.Vector2(1,1)},
-}
+};
 
 //Definisco parametri uniforms Osso
 var uniformsOsso = {
@@ -119,7 +118,7 @@ var uniformsOsso = {
     clight3: { type: "v3", value: new THREE.Vector3() },
     textureRepeat: { type: "v2", value: new THREE.Vector2(1,1) },
     normalScale: {type: "v2", value: new THREE.Vector2(1,1)},
-}
+};
 
 var nuovoUniformsE = uniformsArgento;
 var nuovoUniformsC = uniformsOsso;
@@ -154,15 +153,15 @@ var gui;
 var stats = new Stats();
 
 function init() {
+    
+    renderer.setClearColor( 0xf0f0f0 );
 
-	renderer.setClearColor( 0xf0f0f0 );
+    camera.position.set( 0, 0, 16 );
+    scene.add( camera );
 
-	camera.position.set( 0, 0, 16 );
-	scene.add( camera );
-
-	document.body.appendChild( renderer.domElement );
-	renderer.setPixelRatio( window.devicePixelRatio );
-	renderer.setSize( windowWidth,windowHeight );
+    document.body.appendChild( renderer.domElement );
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( windowWidth,windowHeight );
     //renderer.toneMapping = THREE.NoToneMapping;
     //renderer.toneMapping = THREE.ReinhardToneMapping;
     //renderer.toneMapping = THREE.CineonToneMapping;
@@ -170,14 +169,14 @@ function init() {
     //renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
 
-	window.addEventListener( 'resize', onResize, false );
+    window.addEventListener( 'resize', onResize, false );
 
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
+    stats.domElement.style.position = 'absolute';
+    stats.domElement.style.top = '0px';
     stats.domElement.style.zIndex = "auto";
-	document.body.appendChild( stats.domElement );
+    document.body.appendChild( stats.domElement );
 
-	ourMaterial.needsUpdate = true;
+    ourMaterial.needsUpdate = true;
 
 }
 
@@ -185,10 +184,9 @@ function update() {
 
     windowWidth = window.innerWidth - 470;
     windowHeight = window.innerHeight - 100;
-	
     requestAnimationFrame( update );
-	stats.update();
-	render();
+    stats.update();
+    render();
 
 }
 
@@ -198,7 +196,6 @@ function render() {
 	updateUniforms();
 	renderer.render( scene, camera );
     
-
 }
 
 init();
