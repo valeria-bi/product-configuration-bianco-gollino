@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
 	<head>
-	    <meta charset="utf-8">
-	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	    <meta name="description" content="A layout example that shows off a responsive photo gallery.">
-	    <title>Secondo progetto Interactive 3D Graphics - Valeria Bianco e Alessandro Gollino</title>    
-	 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-	    <link rel="stylesheet" href="css/style.css">
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="A layout example that shows off a responsive photo gallery.">
+		<title>Secondo progetto Interactive 3D Graphics - Valeria Bianco e Alessandro Gollino</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="stylesheet" href="css/style.css">
 	</head>
 	<body>
 		<style type="text/css">@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');</style>
@@ -19,17 +19,16 @@
 		<script src="script/setting.js"></script>
 		<script src="script/funzioni.js"></script>
 
-
 		<script> //Tale funzione serve per quando la pagina è piccola e mostro un menù responsive
-      	function myFunction() {
+		function myFunction() {
 
-         var x = document.getElementById("myTopnav");
-            if (x.className === "navbar") {
-               x.className += " responsive";
-            } else {
-               x.className = "navbar";
-            }
-      	}
+			var x = document.getElementById("myTopnav");
+			if (x.className === "navbar") {
+				x.className += " responsive";
+			} else {
+				x.className = "navbar";
+			}
+		}
       	
       	</script>
 
@@ -162,9 +161,9 @@
 
 			vec3 cdiff;
 
-		    vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
-			    return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
-		    }
+			vec3 inverseTransformDirection( in vec3 dir, in mat4 matrix ) {
+				return normalize( ( vec4( dir, 0.0 ) * matrix ).xyz );
+			}
 
 			void main() {
 				vec3 normal = normalize( vNormal );
@@ -208,9 +207,9 @@
 				vUv = uv;
 				gl_Position = projectionMatrix * vPos;
 			}
-        </script>
-
-        <script type="text/x-glsl" id="fragment_normal">
+		</script>
+		
+		<script type="text/x-glsl" id="fragment_normal">
 			varying vec3 vNormal;
 			varying vec3 vTangent;
 			varying vec3 vBitangent;
@@ -298,17 +297,17 @@
 				// gamma encode the final value
 				gl_FragColor = vec4(pow( outRadiancef, vec3(1.0/2.2)), 1.0);
 			}
-        </script>
+		</script>
 
 		<div>
 			<header>
 				<div class="intro">
 					<a id="nomeE">Elmo Vichingo</a>
-            		<a id="prezzoE"><span id="prezzo">150</span> €</a>
-         		</div>
-         		<div class="navbar" id="myTopnav">
-         			<a href="javascript:void(0);" class="iconM" onclick="myFunction()">Menu</a>
-         			<a id="logo" href="#" title="vai alla home">A C M E</a>
+					<a id="prezzoE"><span id="prezzo">150</span> €</a>
+            	</div>
+            	<div class="navbar" id="myTopnav">
+            		<a href="javascript:void(0);" class="iconM" onclick="myFunction()">Menu</a>
+            		<a id="logo" href="#" title="vai alla home">A C M E</a>
             		<a href="#" title="vai alla pagina Scudi">Scudi</a>
             		<a href="#" title="vai alla pagina Spade">Spade</a>
             		<a href="#" class="link_proprio" title="vai alla pagina Elmi">Elmi</a>
@@ -317,16 +316,16 @@
             		<a href="#" title="Cerca">Cerca</a>
             		<a href="#" title="Carrello">Carrello</a>
             		<a href="javascript:void(0);" class="icon" onclick="myFunction()">
-               			<i class="fa fa-bars"></i>
+            			<i class="fa fa-bars"></i>
             		</a>
-         		</div>
-         	</header>
-         	<div>
-         		<div>
-         			<script id="can" src="script/main.js"></script>
-         		</div>
-         		<div id = "menu" >
-         			<div class="caratteristiche">
+            	</div>
+            </header>
+            <div>
+            	<div>
+            		<script id="can" src="script/main.js"></script>
+            	</div>
+            	<div id = "menu" >
+            		<div class="caratteristiche">
             			<h2 >Configura il modello</h2>
             			<hr>
             			<h3 >Elmo</h3>
@@ -363,20 +362,18 @@
 		            		<li><a onClick="cambiaAmbiente('ForestaInnevata')" href="#">Foresta innevata</a></li>
 		            		<li><a onClick="cambiaAmbiente('Fiordo')" href="#">Fiordo</a></li>
 		            		<li><a onclick="inserisciLuceManuale('')" href="#">Nessun Ambiente</a></li>
-		        		</ul>
-		        		<br>
-        			</div>
-        		</div>
-        		<hr>
+		            	</ul>
+		            	<br>
+		            </div>
+		        </div>
+		        <hr>
         		<div id="descrizione" >
-            		<div>
-                		<h2>Descrizione</h2>
-                		<p>
-            				Elmo vichingo (Nordischer Kammhelm in lingua tedesca) è il nome con cui si suole indicare la particolare tipologia di elmo in ferro sviluppato dalle popolazioni germaniche della Scandinavia durante l'Età del ferro germanica, codificata al tempo della Cultura di Vendel (da cui l'altro nome in tedesco, Vendelhelm) e poi reso celebre in Europa occidentale ed in Russia dalle incursioni dei Vichinghi.
-							Dal Vendelhelm vennero sviluppati, intorno all'Anno Mille, l'elmo "a nasale" noto come elmo normanno e l'elmo russo a mezza-maschera.
-							L'elmo vichingo viene comunemente indicato, a torto, quale tipologia di elmo cornuto. Si tratta di uno dei molti stereotipi che accompagnano il nome dei Vichinghi, sviluppatosi in Europa nel corso del Romanticismo.
-                		</p>
-                		<p>
+        			<div>
+        				<h2>Descrizione</h2>
+        				<p> Elmo vichingo (Nordischer Kammhelm in lingua tedesca) è il nome con cui si suole indicare la particolare tipologia di elmo in ferro sviluppato dalle popolazioni germaniche della Scandinavia durante l'Età del ferro germanica, codificata al tempo della Cultura di Vendel (da cui l'altro nome in tedesco, Vendelhelm) e poi reso celebre in Europa occidentale ed in Russia dalle incursioni dei Vichinghi. Dal Vendelhelm vennero sviluppati, intorno all'Anno Mille, l'elmo "a nasale" noto come elmo normanno e l'elmo russo a mezza-maschera.
+        				L'elmo vichingo viene comunemente indicato, a torto, quale tipologia di elmo cornuto. Si tratta di uno dei molti stereotipi che accompagnano il nome dei Vichinghi, sviluppatosi in Europa nel corso del Romanticismo.
+        				</p>
+        				<p>
                 			Il prodotto rappresenta una replica dell'elmo vichingo personalizzabile secondo le vostre preferenze!
                 		</p>
             		</div>
