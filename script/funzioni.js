@@ -47,7 +47,6 @@ function aggiungiModello (materialeElmo, materialeCorna, materialeFrontino){
 				ourMaterial = materialeFrontino;
 				child.material = ourMaterial;
 			}
-			
 			else{
 				ourMaterial = materialeCorna;
 				child.material = ourMaterial;							
@@ -219,10 +218,10 @@ function cambiaAmbiente(tipo){
 	uniformsArgento.envMap.value = nuovoEnviroment;
 	uniformsOro.envMap.value = nuovoEnviroment;
 
-    uniformsRuggine.irradianceMap.value = nuovoIrradiance;
-    uniformsLatta.irradianceMap.value = nuovoIrradiance;
-    uniformsLegno.irradianceMap.value = nuovoIrradiance;
-    uniformsOsso.irradianceMap.value = nuovoIrradiance;
+	uniformsRuggine.irradianceMap.value = nuovoIrradiance;
+	uniformsLatta.irradianceMap.value = nuovoIrradiance;
+	uniformsLegno.irradianceMap.value = nuovoIrradiance;
+	uniformsOsso.irradianceMap.value = nuovoIrradiance;
 
 	scene.background = nuovoEnviroment;
 	
@@ -241,27 +240,28 @@ function inserisciLuceManuale(){
 
 	scene.background =  0xFFFFF;
 
-    var luce = new THREE.Mesh( new THREE.SphereGeometry( 3, 16,16), new THREE.MeshBasicMaterial ({color: 0xFFFFF} ));
-    luce.position.set( 8,7,7 );
+	var luce = new THREE.Mesh( new THREE.SphereGeometry( 3, 16,16), new THREE.MeshBasicMaterial ({color: 0xFFFFF} ));
+	luce.position.set( 8,7,7 );
 
-    var luce2 = new THREE.Mesh( new THREE.SphereGeometry( 3, 16,16), new THREE.MeshBasicMaterial ({color: 0xFFFFF} ));
-    luce2.position.set( -8,7,7 );
+	var luce2 = new THREE.Mesh( new THREE.SphereGeometry( 3, 16,16), new THREE.MeshBasicMaterial ({color: 0xFFFFF} ));
+	luce2.position.set( -8,7,7 );
 
-    var luce3 = new THREE.Mesh( new THREE.SphereGeometry( 3, 16,16), new THREE.MeshBasicMaterial ({color: 0xFFFFF} ));
-    luce3.position.set( 0,0,-7 );
+	var luce3 = new THREE.Mesh( new THREE.SphereGeometry( 3, 16,16), new THREE.MeshBasicMaterial ({color: 0xFFFFF} ));
+	luce3.position.set( 0,0,-7 );
 
-    uniformsArgento.pointLightPosition.value = new THREE.Vector3(luce.position.x, luce.position.y, luce.position.z); 
-    uniformsOro.pointLightPosition.value = new THREE.Vector3(luce.position.x, luce.position.y, luce.position.z);   
+	uniformsArgento.pointLightPosition.value = new THREE.Vector3(luce.position.x, luce.position.y, luce.position.z); 
+	uniformsOro.pointLightPosition.value = new THREE.Vector3(luce.position.x, luce.position.y, luce.position.z);   
 
 	uniformsArgento.pointLightPosition2.value = new THREE.Vector3(luce2.position.x, luce2.position.y, luce2.position.z); 
-    uniformsOro.pointLightPosition2.value = new THREE.Vector3(luce2.position.x, luce2.position.y, luce2.position.z);   
+	uniformsOro.pointLightPosition2.value = new THREE.Vector3(luce2.position.x, luce2.position.y, luce2.position.z);   
 
 	uniformsArgento.pointLightPosition3.value = new THREE.Vector3(luce3.position.x, luce3.position.y, luce3.position.z); 
-    uniformsOro.pointLightPosition3.value = new THREE.Vector3(luce3.position.x, luce3.position.y, luce3.position.z);   
+	uniformsOro.pointLightPosition3.value = new THREE.Vector3(luce3.position.x, luce3.position.y, luce3.position.z);   
 
 	creaModelloIlluminato(nuovoUniformsE,nuovoUniformsC,nuovoUniformsF);
 
 }
+
 function creaModelloIlluminato(uE,uC,uF){
 
 	while(scene.children.length > 0){ 
