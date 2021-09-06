@@ -39,6 +39,7 @@ var uniformsArgento = {
     pointLightPosition3: { type: "v3", value: new THREE.Vector3() },
     clight3: { type: "v3", value: new THREE.Vector3() },
     envMap: { type: "t", value: textureCubeScogliera},
+    cdiff:  { type: "v3", value: new THREE.Vector3(0,0, 0) },
 };
 
 //Definisco parametri uniforms Oro
@@ -54,6 +55,7 @@ var uniformsOro = {
     pointLightPosition3: { type: "v3", value: new THREE.Vector3() },
     clight3: { type: "v3", value: new THREE.Vector3() },
     envMap: { type: "t", value: textureCubeScogliera},
+    cdiff:  { type: "v3", value: new THREE.Vector3(0,0, 0) },
 };
 
 //Definisco parametri uniforms Ruggine
