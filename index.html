@@ -104,8 +104,8 @@
 				vec3 normal = normalize( vNormal );
 				vec3 tangent = normalize( vTangent );
 				vec3 bitangent = normalize( vBitangent );
-				mat3 vTBN = mat3( tangent, bitangent, normal );
-				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+				mat3 vTBN = mat3( tangent, bitangent, normal ); //serve per passare da tangent space a view space
+				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; //in tangent space
 				//mapN.xy = normalScale * mapN.xy;
 				vec3 n = normalize( vTBN * mapN );
 				vec3 v = normalize( -vPosition);
@@ -117,10 +117,10 @@
 
 	 			vec3 envLight = textureCubeLodEXT( envMap, vec3(-r.x, r.yz), specularMIPLevel ).rgb;
 	 			// texture in sRGB, linearize
-				envLight = pow( envLight, vec3(2.2));
+				envLight = pow( envLight, vec3(2.2)); 	// texture in sRGB, linearize
 				vec3 outRadiance = envLight*BRDF_Specular_GGX_Environment(n, v, cspec, alpha);
 				// gamma encode the final value
-				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
+				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0); // gamma encode the final value
 				//gl_FragColor = vec4(r,1.0);
 			}
 		</script>
@@ -169,21 +169,21 @@
 				vec3 normal = normalize( vNormal );
 				vec3 tangent = normalize( vTangent );
 				vec3 bitangent = normalize( vBitangent );
-				mat3 vTBN = mat3( tangent, bitangent, normal );
-				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+				mat3 vTBN = mat3( tangent, bitangent, normal ); //serve per passare da tangent space a view space
+				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; //tangent space
 				//mapN.xy = normalScale * mapN.xy;
 				vec3 n = normalize( vTBN * mapN );
 				vec3 worldN = inverseTransformDirection( n, viewMatrix );
 				// negate x to account for how cubemap is displayed on background
 				vec3 irradiance = textureCube( irradianceMap, worldN).rgb;
 				// texture in sRGB, linearize
-				irradiance = pow( irradiance, vec3(2.2));
+				irradiance = pow( irradiance, vec3(2.2)); // texture in sRGB, linearize
 				cdiff = texture2D( diffuseMap, vUv  *textureRepeat).rgb;
 				// texture in sRGB, linearize
-				cdiff = pow( cdiff, vec3(2.2));
+				cdiff = pow( cdiff, vec3(2.2)); // texture in sRGB, linearize
 				vec3 outRadiance = cdiff*irradiance;
 				// gamma encode the final value
-				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0);
+				gl_FragColor = vec4(pow( outRadiance, vec3(1.0/2.2)), 1.0); // gamma encode the final value
 			}
 		</script>
 
@@ -258,8 +258,8 @@
 				vec3 tangent = normalize( vTangent );
 				vec3 bitangent = normalize( vBitangent );
 				// matrix to convert bewtween tangent space and view space
-				mat3 vTBN = mat3( tangent, bitangent, normal );
-				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0;
+				mat3 vTBN = mat3( tangent, bitangent, normal ); //serve per passare da tangent space a view space
+				vec3 mapN = texture2D( normalMap, vUv ).xyz * 2.0 - 1.0; //tangent space
 				//mapN.xy = normalScale * mapN.xy;
 				vec3 n = normalize( vTBN * mapN );
 				vec3 v = normalize( -vPosition);
@@ -314,7 +314,7 @@
 					<a href="#" title="vai alla pagina Lance">Lance</a>
 					<a href="#" title="vai alla pagina Altro">Altro</a>
 					<a href="#" title="Cerca">Cerca</a>
-					<a href="#" title="Carrello">Carrello</a>
+					<a href="#" title="vai al carrello">Carrello</a>
 					<a href="javascript:void(0);" class="icon" onclick="myFunction()">
 						<i class="fa fa-bars"></i>
 					</a>
