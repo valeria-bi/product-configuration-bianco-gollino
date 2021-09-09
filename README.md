@@ -46,7 +46,7 @@ Elmo: argento; Corna: oro; Frontino: oro; Nessun ambiente: illuminazione tramite
 ## Implementazione
 Come si può notare il layaout da noi sviluppato e quello della pagina di ispirazione sono molto diversi: abbiamo voluto utilizzare modificandole alcune delle soluzioni adottate nel sito della Apple. 
 
-Per realizzare il configuratore del modello abbiamo utilizZato tre coppie di vertex-fragment shaders:
+Per realizzare il configuratore del modello abbiamo utilizzato tre coppie di vertex-fragment shaders:
 
 * *Glossy Reflection Mapping*: per realizzare gli shader dei materiali argento e oro. L'illuminazione proviene dall'ambiente circostante.
 * *Irradiance Map with diffuse BRDF*: per realizzare gli shader dei materiali latta, legno, osso, ruggine.
