@@ -13,7 +13,7 @@ I materiali scelti per l'elmo sono: argento, oro, latta, legno e ruggine. I mate
 Il modello scelto si presta bene ad evidenziare molte delle funzionalità viste durante il corso di Interactive 3D graphics.
 
 ## Struttura del progetto
-- index.html: contiene i quattro shader utilizzati e gli elementi dell'interfaccia web;
+- index.html: contiene i tre shader utilizzati e gli elementi dell'interfaccia web;
 - css: cartella che contiene il file *.css* per gestire gli elementi dell'interfaccia;
 - immagini: la cartella contiene le immagini delle icone utilizzate per i materiali;
 - images: la cartella contiene le immagini utilizzate per la creazione del file README.md e journal.md;
