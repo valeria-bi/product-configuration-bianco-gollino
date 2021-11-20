@@ -40,5 +40,5 @@
 * implementazione dell'interfaccia
 * pulizia codice
 
-## 16 agosto 2021
+## 28 ottobre 2021
 * risolto problema del frontino. Ora si riescono a manipolare tutte le parti
