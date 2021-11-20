@@ -59,4 +59,3 @@ Gli shader realizzati sono stati presi dal repository del corso di Interactive 3
 - Cubemap: http://www.humus.name;
 - Texture materiali: https://ambientcg.com/categories;
 - Layaout di ispirazione per la pagina web: https://www.apple.com/it/shop/buy-iphone/iphone-12;
-ù
